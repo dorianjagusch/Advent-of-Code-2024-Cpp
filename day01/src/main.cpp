@@ -1,10 +1,12 @@
 #include <iostream>
 #include <fstream>
-#include "FileParser.hpp"
+#include "LocationChecker.hpp"
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
 
-    if (argc != 2) {
+    if (argc != 2)
+    {
         std::cerr << "Usage: " << argv[0] << " <input file>" << std::endl;
         return 1;
     }
@@ -12,10 +14,10 @@ int main(int argc, char* argv[]) {
     std::ifstream inputFile;
     inputFile.open(argv[1], std::ios::in);
 
-    FileParser fileParser(inputFile);
-    fileParser.checkInstream();
-    fileParser.parseFile();
-    fileParser.sortLocationIDs();
-    std::cout << "The sum of differences is: " << fileParser.calculateDifferences() << std::endl;
-    std::cout << "The similarity score is: " << fileParser.calculateSimilarity() << std::endl;
+    LocationChecker LocationChecker(inputFile);
+    LocationChecker.checkInstream();
+    LocationChecker.parseFile();
+    LocationChecker.sortLocationIDs();
+    std::cout << "The sum of differences is: " << LocationChecker.calculateDifferences() << std::endl;
+    std::cout << "The similarity score is: " << LocationChecker.calculateSimilarity() << std::endl;
 }

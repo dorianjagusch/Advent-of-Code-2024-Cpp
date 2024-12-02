@@ -1,6 +1,6 @@
-#include "FileParser.hpp"
+#include "LocationChecker.hpp"
 
-FileParser::FileParser(std::ifstream &instream) : p_instream(std::move(instream))
+LocationChecker::LocationChecker(std::ifstream &instream) : p_instream(std::move(instream))
 {
     if (!p_instream.is_open())
     {
@@ -9,15 +9,15 @@ FileParser::FileParser(std::ifstream &instream) : p_instream(std::move(instream)
     }
 }
 
-FileParser::~FileParser()
+LocationChecker::~LocationChecker()
 {
-    if(p_instream.is_open())
+    if (p_instream.is_open())
     {
         p_instream.close();
     }
 }
 
-void FileParser::checkInstream()
+void LocationChecker::checkInstream()
 {
     if (!p_instream.is_open() || !p_instream.good() || p_instream.peek() < 0)
     {
@@ -26,7 +26,7 @@ void FileParser::checkInstream()
     }
 }
 
-std::vector<std::string> FileParser::split(const std::string &s, char delim)
+std::vector<std::string> LocationChecker::split(const std::string &s, char delim)
 {
     std::vector<std::string> result;
     std::stringstream ss(s);
@@ -38,7 +38,7 @@ std::vector<std::string> FileParser::split(const std::string &s, char delim)
     return result;
 }
 
-void FileParser::parseFile()
+void LocationChecker::parseFile()
 {
     std::string line;
     do
@@ -56,13 +56,13 @@ void FileParser::parseFile()
     p_instream.close();
 }
 
-void FileParser::sortLocationIDs()
+void LocationChecker::sortLocationIDs()
 {
     std::sort(p_locationIDs1.begin(), p_locationIDs1.end());
     std::sort(p_locationIDs2.begin(), p_locationIDs2.end());
 }
 
-size_t FileParser::calculateDifferences ()
+size_t LocationChecker::calculateDifferences()
 {
     size_t sum = 0;
     for (size_t i = 0; i < p_locationIDs1.size(); i++)
@@ -72,8 +72,7 @@ size_t FileParser::calculateDifferences ()
     return sum;
 }
 
-
-std::map<int, int> FileParser::vectorToMap(const std::vector<int> &vec)
+std::map<int, int> LocationChecker::vectorToMap(const std::vector<int> &vec)
 {
     std::map<int, int> occurrences;
     for (const int &num : vec)
@@ -83,7 +82,7 @@ std::map<int, int> FileParser::vectorToMap(const std::vector<int> &vec)
     return occurrences;
 }
 
-size_t FileParser::calculateSimilarity()
+size_t LocationChecker::calculateSimilarity()
 {
     size_t score = 0;
     std::map<int, int> occurrences = vectorToMap(p_locationIDs2);

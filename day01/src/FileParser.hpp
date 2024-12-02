@@ -7,11 +7,11 @@
 #include <algorithm>
 #include <map>
 
-class FileParser
+class LocationChecker
 {
 public:
-    FileParser(std::ifstream &instream);
-    ~FileParser();
+    LocationChecker(std::ifstream &instream);
+    ~LocationChecker();
     void checkInstream();
     void parseFile();
     size_t calculateDifferences();
@@ -24,5 +24,5 @@ private:
     std::vector<int> p_locationIDs2;
 
     std::vector<std::string> split(const std::string &s, char delim);
-    std::map< int, int > vectorToMap(const std::vector<int> &vec);
+    std::map<int, int> vectorToMap(const std::vector<int> &vec);
 };

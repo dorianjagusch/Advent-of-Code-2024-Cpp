@@ -9,9 +9,11 @@ XFLAGS = -g -Wconversion -Wshadow
 
 RM = /bin/rm
 
-CLASS_FILES := LocationChecker
+CLASS_FILES := FileParser \
+	RecordAnalyser
 
-FILES := LocationChecker
+FILES := FileParser \
+	RecordAnalyser
 
 S = src
 O = obj
