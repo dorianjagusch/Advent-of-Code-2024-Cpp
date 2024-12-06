@@ -67,7 +67,7 @@ std::vector<int> Solver::topologicalSort(graph const &graph, std::unordered_map<
             continue;
         }
         for (int neighbour : graph.at(node))
-        {  
+        {
             if (inDegree.find(neighbour) == inDegree.end()){
                 continue;
             }

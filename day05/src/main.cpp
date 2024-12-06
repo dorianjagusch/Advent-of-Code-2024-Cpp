@@ -10,6 +10,7 @@ int main(int ac, char *av[])
     if (ac != 2)
     {
         std::cout << "Execute with: ./a.out <filename>" << std::endl;
+        return 1;
     }
 
     inputData data = FileParser::parse_input(av[1]);
