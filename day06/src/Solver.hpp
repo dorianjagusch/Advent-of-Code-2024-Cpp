@@ -43,17 +43,13 @@ private:
         {CardinalDir::South, {1, 0}},
         {CardinalDir::West, {0, -1}}};
 
-    std::unordered_set<size_t> calculatePath(size_t, CardinalDir);
+    using PathCells = std::unordered_map<Solver::CardinalDir, std::unordered_set<size_t>>;
+
+    PathCells calculatePath(size_t, CardinalDir);
     CardinalDir changeDir(CardinalDir);
-    size_t moveGuard(size_t const, CardinalDir);
     std::pair<size_t, size_t> checkAhead(size_t const, CardinalDir);
     size_t getIndex(size_t const, size_t const) const;
-    size_t getCurrentCol(size_t const) const;
-    size_t getCurrentRow(size_t const) const;
-    bool isOutOfBounds(size_t const) const;
+    std::unordered_set<size_t> collapsePath(PathCells);
     bool isOutOfBounds(std::pair<size_t, size_t>) const;
     size_t countInfiniteLoops(size_t, std::unordered_set<size_t>);
-    bool isPathInfinite(size_t , CardinalDir directon);
 };
-
-void operator<<(std::ostream &os, std::vector<std::string> const &map);

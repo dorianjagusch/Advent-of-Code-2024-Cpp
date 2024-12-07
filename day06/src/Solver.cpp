@@ -1,14 +1,5 @@
 #include "Solver.hpp"
 
-void operator<<(std::ostream &os, std::vector<std::string> const &map)
-{
-    for (auto const &line : map)
-    {
-        os << line << std::endl;
-    }
-    os << std::endl;
-}
-
 Solver::Solver(std::vector<std::string> inputMap)
 {
     map.nRows = inputMap.size();
@@ -38,24 +29,9 @@ size_t Solver::getIndex(size_t const row, size_t const col) const
     return row * map.nCols + col;
 }
 
-bool Solver::isOutOfBounds(size_t const index) const
-{
-    return getCurrentRow(index) >= map.nRows;
-}
-
 bool Solver::isOutOfBounds(std::pair<size_t, size_t> location) const
 {
     return location.first >= map.nRows || location.second >= map.nCols;
-}
-
-size_t Solver::getCurrentRow(size_t const index) const
-{
-    return index / map.nCols;
-}
-
-size_t Solver::getCurrentCol(size_t const index) const
-{
-    return index % map.nCols;
 }
 
 Solver::CardinalDir Solver::changeDir(CardinalDir current)
@@ -66,8 +42,8 @@ Solver::CardinalDir Solver::changeDir(CardinalDir current)
 
 std::pair<size_t, size_t> Solver::checkAhead(size_t const current, CardinalDir direction)
 {
-    size_t curRow = getCurrentRow(current);
-    size_t curCol = getCurrentCol(current);
+    size_t curRow = current / map.nCols;
+    size_t curCol = current % map.nCols;
 
     size_t newRow = curRow + directions[direction].first;
     size_t newCol = curCol + directions[direction].second;
@@ -75,40 +51,7 @@ std::pair<size_t, size_t> Solver::checkAhead(size_t const current, CardinalDir d
     return std::pair<size_t, size_t>(newRow, newCol);
 }
 
-size_t Solver::moveGuard(size_t const current, CardinalDir direction)
-{
-    size_t curRow = getCurrentRow(current);
-    size_t curCol = getCurrentCol(current);
-
-    size_t newRow = curRow + directions[direction].first;
-    size_t newCol = curCol + directions[direction].second;
-
-    return getIndex(newRow, newCol);
-}
-
-std::unordered_set<size_t> Solver::calculatePath(size_t currentPos, CardinalDir direction)
-{
-    std::unordered_set<size_t> visitedCells;
-    std::pair<size_t, size_t> lookAhead = checkAhead(currentPos, direction);
-    while (!isOutOfBounds(lookAhead))
-    {
-        visitedCells.insert(currentPos);
-        while (!isOutOfBounds(lookAhead) && map.obstacles.find(getIndex(lookAhead.first, lookAhead.second)) == map.obstacles.end())
-        {
-            currentPos = getIndex(lookAhead.first, lookAhead.second);
-            visitedCells.insert(currentPos);
-            lookAhead = checkAhead(currentPos, direction);
-        }
-        if (!isOutOfBounds(lookAhead))
-        {
-            direction = changeDir(direction);
-            lookAhead = checkAhead(currentPos, direction);
-        }
-    }
-    return visitedCells;
-}
-
-bool Solver::isPathInfinite(size_t currentPos, CardinalDir direction)
+Solver::PathCells Solver::calculatePath(size_t currentPos, CardinalDir direction)
 {
     std::unordered_map<CardinalDir, std::unordered_set<size_t>> visited;
     std::pair<size_t, size_t> lookAhead = checkAhead(currentPos, direction);
@@ -118,7 +61,7 @@ bool Solver::isPathInfinite(size_t currentPos, CardinalDir direction)
         {
             if (visited[direction].find(getIndex(lookAhead.first, lookAhead.second)) != visited[direction].end())
             {
-                return true;
+                return {};
             }
             currentPos = getIndex(lookAhead.first, lookAhead.second);
             visited[direction].insert(currentPos);
@@ -130,7 +73,17 @@ bool Solver::isPathInfinite(size_t currentPos, CardinalDir direction)
             lookAhead = checkAhead(currentPos, direction);
         }
     }
-    return false;
+    return visited;
+}
+
+std::unordered_set<size_t> Solver::collapsePath(PathCells path)
+{
+    std::unordered_set<size_t> uniqueCells;
+    for (auto &[direction, cells] : path)
+    {
+        uniqueCells.insert(cells.begin(), cells.end());
+    }
+    return uniqueCells;
 }
 
 size_t Solver::countInfiniteLoops(size_t currentPos, std::unordered_set<size_t> path)
@@ -142,7 +95,7 @@ size_t Solver::countInfiniteLoops(size_t currentPos, std::unordered_set<size_t> 
     for (size_t position : path)
     {
         map.obstacles.insert(position);
-        infiniteLoops += isPathInfinite(currentPos, CardinalDir::North);
+        infiniteLoops += calculatePath(currentPos, CardinalDir::North).empty();
         map.obstacles.erase(position);
     }
     return infiniteLoops;
@@ -150,11 +103,12 @@ size_t Solver::countInfiniteLoops(size_t currentPos, std::unordered_set<size_t> 
 
 std::pair<size_t, size_t> Solver::solve()
 {
-    std::unordered_set<size_t> path;
+    PathCells path;
     size_t infiniteLoops = 0;
 
     path = calculatePath(map.guardPosition, CardinalDir::North);
-    infiniteLoops = countInfiniteLoops(map.guardPosition, path);
+    std::unordered_set<size_t> uniqueCells = collapsePath(path);
+    infiniteLoops = countInfiniteLoops(map.guardPosition, uniqueCells);
 
-    return std::pair<size_t, size_t>(path.size(), infiniteLoops);
+    return std::pair<size_t, size_t>(uniqueCells.size(), infiniteLoops);
 }

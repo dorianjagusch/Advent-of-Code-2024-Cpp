@@ -17,6 +17,6 @@ int main(int ac, char *av[])
     Solver solver(map);
     std::pair<size_t, size_t> result = solver.solve();
     std::cout << "The path length is " << result.first << " units long."<< std::endl;
-    std::cout << "There sum of the middle entries in the fixed updates is " << result.second << std::endl;
+    std::cout << "There are " << result.second << " places to create infinite loops." << std::endl;
     return 0;
 }
