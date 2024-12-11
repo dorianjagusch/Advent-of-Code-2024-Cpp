@@ -14,7 +14,7 @@ int main(int ac, char *av[])
     Data parsedInput = FileParser::parseInput(rawInput);
     Solver solver(parsedInput);
     std::pair<uint64_t, uint64_t> result = solver.solve();
-    std::cout << "The checksum is " << result.second << "." << std::endl;
-    // std::cout << "The checksum of the unfragmented data is " << result.second << "." << std::endl;
+    std::cout << "The checksum is " << result.first << "." << std::endl;
+    std::cout << "The checksum of the unfragmented data is " << result.second << "." << std::endl;
     return 0;
 }
